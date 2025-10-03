@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: '3.24.0'          # o la estable actual
+  FLUTTER_VERSION: 'stable'          # o fija, p. ej. '3.24.0'
   REPOSITORY_NAME: ${{ github.event.repository.name }}
 
 jobs:
@@ -23,10 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/configure-pages@v5
-        with:
-          static_site_generator: static
 
       - uses: subosito/flutter-action@v2
         with:
@@ -37,10 +33,10 @@ jobs:
       - run: flutter pub get
       - run: flutter test
 
-      # IMPORTANTE: base-href para gh-pages
+      # base-href correcto para Pages (repo user.github.io/<repo>/)
       - run: flutter build web --release --base-href "/${{ env.REPOSITORY_NAME }}/"
 
-      # SPA fallback + sin Jekyll
+      # SPA fallback + desactivar Jekyll
       - run: cp build/web/index.html build/web/404.html
       - run: echo > build/web/.nojekyll
 
