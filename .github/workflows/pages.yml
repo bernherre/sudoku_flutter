@@ -1,3 +1,4 @@
+﻿# .github/workflows/pages.yml
 name: Build & Deploy Flutter Web to GitHub Pages
 
 on:
@@ -15,8 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: 'stable'          # o fija, p. ej. '3.24.0'
   REPOSITORY_NAME: ${{ github.event.repository.name }}
+  # Si tu repo es user.github.io, pon BASE_HREF="/" (ver nota al final)
+  BASE_HREF: "/${{ github.event.repository.name }}/"
 
 jobs:
   build:
@@ -26,17 +28,15 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
+          channel: stable       # 👈 solo canal
+          cache: true
 
       - run: flutter --version
       - run: flutter pub get
       - run: flutter test
 
-      # base-href correcto para Pages (repo user.github.io/<repo>/)
-      - run: flutter build web --release --base-href "/${{ env.REPOSITORY_NAME }}/"
+      - run: flutter build web --release --base-href "${{ env.BASE_HREF }}"
 
-      # SPA fallback + desactivar Jekyll
       - run: cp build/web/index.html build/web/404.html
       - run: echo > build/web/.nojekyll
 
